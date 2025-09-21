@@ -745,9 +745,9 @@ namespace MKVRenamer
                 {
                     topBar.ColumnCount = 3;
                     topBar.RowCount = 1;
-                    topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 45F));
+                    topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 40F));
                     topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 35F));
-                    topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 20F));
+                    topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 25F));
                     topBar.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.Percent, 100F));
                     topBar.SetCellPosition(cardFolder, new WinForms.TableLayoutPanelCellPosition(0, 0));
                     topBar.SetCellPosition(cardSeries, new WinForms.TableLayoutPanelCellPosition(1, 0));
