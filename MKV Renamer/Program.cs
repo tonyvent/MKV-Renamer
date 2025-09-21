@@ -627,7 +627,7 @@ namespace MKVRenamer
             };
             topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 45F));
             topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 35F));
-            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
+            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 20F));
             topBarOuter.Controls.Add(topBar);
 
             WinForms.Panel Card() => new WinForms.Panel
@@ -669,7 +669,7 @@ namespace MKVRenamer
             {
                 Dock = WinForms.DockStyle.Fill,
                 ColumnCount = 3,
-                AutoSize = false,
+                AutoSize = true,
                 Padding = new WinForms.Padding(0),
                 Margin = WinForms.Padding.Empty
             };
@@ -680,12 +680,12 @@ namespace MKVRenamer
             numSeasonsTV = new WinForms.NumericUpDown { Minimum = 1, Maximum = 99, Value = 1, Width = 72, Margin = new WinForms.Padding(0, 2, 10, 2) };
             btnCreateSeasonsTV = new ModernButton { Text = "Create Season Folders" };
             btnCreateSeasonsTV.UseDefaultMargin = false;
-            // important: keep the button inside its cell
-            btnCreateSeasonsTV.AutoSize = false;
-            btnCreateSeasonsTV.MinimumSize = new Drawing.Size(220, 44);
+            btnCreateSeasonsTV.AutoSize = true;
+            btnCreateSeasonsTV.AutoSizeMode = WinForms.AutoSizeMode.GrowAndShrink;
+            btnCreateSeasonsTV.MinimumSize = new Drawing.Size(0, 44);
             btnCreateSeasonsTV.Height = 44;
-            btnCreateSeasonsTV.Dock = WinForms.DockStyle.Fill;
-            btnCreateSeasonsTV.Margin = new WinForms.Padding(0, 0, 0, 0);
+            btnCreateSeasonsTV.Anchor = WinForms.AnchorStyles.Left;
+            btnCreateSeasonsTV.Margin = new WinForms.Padding(0);
             btnCreateSeasonsTV.Click += BtnCreateSeasonsTV_Click;
 
             seasonsRow.Controls.Add(lblSeasons, 0, 0);
