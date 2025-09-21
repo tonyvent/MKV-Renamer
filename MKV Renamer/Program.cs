@@ -740,6 +740,9 @@ namespace MKVRenamer
                     topBar.SetCellPosition(cardFolder, new WinForms.TableLayoutPanelCellPosition(0, 0));
                     topBar.SetCellPosition(cardSeries, new WinForms.TableLayoutPanelCellPosition(0, 1));
                     topBar.SetCellPosition(cardSeasons, new WinForms.TableLayoutPanelCellPosition(0, 2));
+                    cardFolder.Margin = new WinForms.Padding(12, 0, 12, 12);
+                    cardSeries.Margin = new WinForms.Padding(12, 0, 12, 12);
+                    cardSeasons.Margin = new WinForms.Padding(12, 0, 12, 0);
                 }
                 else
                 {
@@ -752,6 +755,9 @@ namespace MKVRenamer
                     topBar.SetCellPosition(cardFolder, new WinForms.TableLayoutPanelCellPosition(0, 0));
                     topBar.SetCellPosition(cardSeries, new WinForms.TableLayoutPanelCellPosition(1, 0));
                     topBar.SetCellPosition(cardSeasons, new WinForms.TableLayoutPanelCellPosition(2, 0));
+                    cardFolder.Margin = new WinForms.Padding(12, 0, 12, 0);
+                    cardSeries.Margin = new WinForms.Padding(12, 0, 12, 0);
+                    cardSeasons.Margin = new WinForms.Padding(12, 0, 12, 0);
                 }
 
                 topBar.ResumeLayout();
@@ -875,6 +881,78 @@ namespace MKVRenamer
             assignRow.Controls.Add(cboSeasonTV, 1, 0);
             assignRow.Controls.Add(btnAssignSeasonTV, 2, 0);
             assignRow.Controls.Add(btnEditTitleTV, 3, 0);
+            bool? assignRowStacked = null;
+
+            void ConfigureAssignRowLayout()
+            {
+                bool stack = assignRow.Width < 820;
+                if (assignRowStacked.HasValue && assignRowStacked.Value == stack) return;
+
+                assignRowStacked = stack;
+                assignRow.SuspendLayout();
+                assignRow.ColumnStyles.Clear();
+                assignRow.RowStyles.Clear();
+
+                if (stack)
+                {
+                    assignRow.ColumnCount = 1;
+                    assignRow.RowCount = 4;
+                    assignRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
+                    for (int i = 0; i < 4; i++) assignRow.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.AutoSize));
+
+                    assignRow.SetCellPosition(lblAssign, new WinForms.TableLayoutPanelCellPosition(0, 0));
+                    assignRow.SetCellPosition(cboSeasonTV, new WinForms.TableLayoutPanelCellPosition(0, 1));
+                    assignRow.SetCellPosition(btnAssignSeasonTV, new WinForms.TableLayoutPanelCellPosition(0, 2));
+                    assignRow.SetCellPosition(btnEditTitleTV, new WinForms.TableLayoutPanelCellPosition(0, 3));
+
+                    lblAssign.Margin = new WinForms.Padding(0, 0, 0, 6);
+
+                    cboSeasonTV.Dock = WinForms.DockStyle.Fill;
+                    cboSeasonTV.Margin = new WinForms.Padding(0, 0, 0, 10);
+
+                    btnAssignSeasonTV.Dock = WinForms.DockStyle.Fill;
+                    btnAssignSeasonTV.AutoSize = false;
+                    btnAssignSeasonTV.Margin = new WinForms.Padding(0, 0, 0, 10);
+
+                    btnEditTitleTV.Dock = WinForms.DockStyle.Fill;
+                    btnEditTitleTV.AutoSize = false;
+                    btnEditTitleTV.Margin = new WinForms.Padding(0);
+                }
+                else
+                {
+                    assignRow.ColumnCount = 4;
+                    assignRow.RowCount = 1;
+                    assignRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
+                    assignRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
+                    assignRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
+                    assignRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
+                    assignRow.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.Percent, 100F));
+
+                    assignRow.SetCellPosition(lblAssign, new WinForms.TableLayoutPanelCellPosition(0, 0));
+                    assignRow.SetCellPosition(cboSeasonTV, new WinForms.TableLayoutPanelCellPosition(1, 0));
+                    assignRow.SetCellPosition(btnAssignSeasonTV, new WinForms.TableLayoutPanelCellPosition(2, 0));
+                    assignRow.SetCellPosition(btnEditTitleTV, new WinForms.TableLayoutPanelCellPosition(3, 0));
+
+                    lblAssign.Margin = new WinForms.Padding(0, 0, 12, 0);
+
+                    cboSeasonTV.Dock = WinForms.DockStyle.None;
+                    cboSeasonTV.Margin = new WinForms.Padding(0, 0, 16, 0);
+                    cboSeasonTV.Width = 140;
+
+                    btnAssignSeasonTV.Dock = WinForms.DockStyle.None;
+                    btnAssignSeasonTV.AutoSize = true;
+                    btnAssignSeasonTV.Margin = new WinForms.Padding(0, 0, 12, 0);
+
+                    btnEditTitleTV.Dock = WinForms.DockStyle.None;
+                    btnEditTitleTV.AutoSize = true;
+                    btnEditTitleTV.Margin = new WinForms.Padding(0);
+                }
+
+                assignRow.ResumeLayout();
+            }
+
+            ConfigureAssignRowLayout();
+            assignRow.SizeChanged += (s, e) => ConfigureAssignRowLayout();
             table.Controls.Add(CreateSection(assignRow, new WinForms.Padding(20, 12, 20, 12)), 0, 2);
 
             // ---------- BOTTOM ROW (button + slim log) ----------
@@ -894,6 +972,7 @@ namespace MKVRenamer
             btnMoveRenameTV.AutoSize = false;
             btnMoveRenameTV.MinimumSize = new Drawing.Size(220, 44);
             btnMoveRenameTV.Height = 44;
+            btnMoveRenameTV.Anchor = WinForms.AnchorStyles.Left;
             btnMoveRenameTV.Click += BtnMoveRenameTV_Click;
 
             txtLogTV = new WinForms.TextBox
@@ -908,6 +987,56 @@ namespace MKVRenamer
 
             bottomRow.Controls.Add(btnMoveRenameTV, 0, 0);
             bottomRow.Controls.Add(txtLogTV, 1, 0);
+            bool? bottomRowStacked = null;
+
+            void ConfigureBottomRowLayout()
+            {
+                bool stack = bottomRow.Width < 760;
+                if (bottomRowStacked.HasValue && bottomRowStacked.Value == stack) return;
+
+                bottomRowStacked = stack;
+                bottomRow.SuspendLayout();
+                bottomRow.ColumnStyles.Clear();
+                bottomRow.RowStyles.Clear();
+
+                if (stack)
+                {
+                    bottomRow.ColumnCount = 1;
+                    bottomRow.RowCount = 2;
+                    bottomRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
+                    bottomRow.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.AutoSize));
+                    bottomRow.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.AutoSize));
+                    bottomRow.SetCellPosition(btnMoveRenameTV, new WinForms.TableLayoutPanelCellPosition(0, 0));
+                    bottomRow.SetCellPosition(txtLogTV, new WinForms.TableLayoutPanelCellPosition(0, 1));
+
+                    btnMoveRenameTV.Dock = WinForms.DockStyle.Fill;
+                    btnMoveRenameTV.Margin = new WinForms.Padding(0, 0, 0, 10);
+
+                    txtLogTV.Dock = WinForms.DockStyle.Fill;
+                    txtLogTV.Margin = new WinForms.Padding(0);
+                }
+                else
+                {
+                    bottomRow.ColumnCount = 2;
+                    bottomRow.RowCount = 1;
+                    bottomRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
+                    bottomRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
+                    bottomRow.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.Percent, 100F));
+                    bottomRow.SetCellPosition(btnMoveRenameTV, new WinForms.TableLayoutPanelCellPosition(0, 0));
+                    bottomRow.SetCellPosition(txtLogTV, new WinForms.TableLayoutPanelCellPosition(1, 0));
+
+                    btnMoveRenameTV.Dock = WinForms.DockStyle.None;
+                    btnMoveRenameTV.Margin = new WinForms.Padding(0, 0, 18, 0);
+
+                    txtLogTV.Dock = WinForms.DockStyle.Fill;
+                    txtLogTV.Margin = new WinForms.Padding(0);
+                }
+
+                bottomRow.ResumeLayout();
+            }
+
+            ConfigureBottomRowLayout();
+            bottomRow.SizeChanged += (s, e) => ConfigureBottomRowLayout();
             table.Controls.Add(CreateSection(bottomRow, new WinForms.Padding(20, 8, 20, 12), new WinForms.Padding(0)), 0, 3);
 
             AutoSizeColumnsTV();
