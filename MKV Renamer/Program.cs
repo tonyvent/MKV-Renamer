@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using System;
 using System.IO;
 using System.Linq;
@@ -28,12 +28,11 @@ namespace MKVRenamer
         // ===== THEME =====
         private static class Theme
         {
-            // Modern colorful palette (emerald accent)
-            public static readonly Drawing.Color Accent = Drawing.Color.FromArgb(16, 122, 72);       // emerald
+            public static readonly Drawing.Color Accent = Drawing.Color.FromArgb(16, 122, 72);
             public static readonly Drawing.Color AccentHover = Drawing.Color.FromArgb(12, 98, 58);
             public static readonly Drawing.Color AccentPressed = Drawing.Color.FromArgb(8, 78, 46);
-            public static readonly Drawing.Color Surface = Drawing.Color.FromArgb(232, 242, 238);    // soft tinted panel
-            public static readonly Drawing.Color WindowBg = Drawing.Color.FromArgb(242, 247, 245);   // near-white neutral
+            public static readonly Drawing.Color Surface = Drawing.Color.FromArgb(232, 242, 238);
+            public static readonly Drawing.Color WindowBg = Drawing.Color.FromArgb(242, 247, 245);
             public static readonly Drawing.Color InputBg = Drawing.Color.FromArgb(252, 253, 252);
             public static readonly Drawing.Color Text = Drawing.Color.FromArgb(22, 28, 25);
             public static readonly Drawing.Color TextOnAccent = Drawing.Color.White;
@@ -77,8 +76,6 @@ namespace MKVRenamer
                 using var pen = new Drawing.Pen(bg, 1f);
                 g.FillPath(b, path);
                 g.DrawPath(pen, path);
-
-                // text
                 var sf = new Drawing.StringFormat { Alignment = Drawing.StringAlignment.Center, LineAlignment = Drawing.StringAlignment.Center };
                 using var txt = new Drawing.SolidBrush(Theme.TextOnAccent);
                 g.DrawString(Text, Font, txt, rect, sf);
@@ -97,7 +94,6 @@ namespace MKVRenamer
 
         private void ApplyThemeRecursive(WinForms.Control root)
         {
-            // Base colors
             root.BackColor = root is WinForms.TextBox or WinForms.ListBox or WinForms.CheckedListBox or WinForms.ListView ? Theme.InputBg : Theme.WindowBg;
             root.ForeColor = Theme.Text;
             if (root is WinForms.TabPage tp) tp.Padding = new WinForms.Padding(12);
@@ -107,7 +103,6 @@ namespace MKVRenamer
                 switch (c)
                 {
                     case WinForms.Button b:
-                        // fallback for non-ModernButton
                         b.FlatStyle = WinForms.FlatStyle.Flat; b.FlatAppearance.BorderSize = 0;
                         b.BackColor = Theme.Accent; b.ForeColor = Theme.TextOnAccent;
                         b.Font = new Drawing.Font("Segoe UI Semibold", 10.5F); b.Padding = new WinForms.Padding(14, 10, 14, 10); b.Margin = new WinForms.Padding(10);
@@ -196,6 +191,9 @@ namespace MKVRenamer
             Font = new Drawing.Font("Segoe UI", 10.5F);
             BackColor = Theme.WindowBg; ForeColor = Theme.Text; DoubleBuffered = true;
 
+            // 🔹 Use the EXE’s embedded icon for the window/taskbar
+            try { this.Icon = Drawing.Icon.ExtractAssociatedIcon(WinForms.Application.ExecutablePath); } catch { /* no-op if unavailable */ }
+
             tabs = new WinForms.TabControl { Dock = WinForms.DockStyle.Fill, DrawMode = WinForms.TabDrawMode.OwnerDrawFixed, Padding = new Drawing.Point(22, 8) };
             tabs.DrawItem += Tabs_DrawItem;
 
@@ -242,21 +240,18 @@ namespace MKVRenamer
             table.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.Absolute, 40));
             tabMain.Controls.Clear(); tabMain.Controls.Add(table);
 
-            // Folder row
             var folderRow1 = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Top, ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(2) };
             folderRow1.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
             folderRow1.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             txtFolder1 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, ReadOnly = true, PlaceholderText = "Select a movie folder (e.g., Austin Powers Goldmember (2002))" };
-            btnBrowse1 = new ModernButton { Text = "Browse�" }; btnBrowse1.Click += BtnBrowse1_Click;
+            btnBrowse1 = new ModernButton { Text = "Browse…" }; btnBrowse1.Click += BtnBrowse1_Click;
             folderRow1.Controls.Add(txtFolder1, 0, 0); folderRow1.Controls.Add(btnBrowse1, 1, 0);
             table.Controls.Add(folderRow1, 0, 0);
 
-            // Split main area
             split1 = new WinForms.SplitContainer { Dock = WinForms.DockStyle.Fill, Orientation = WinForms.Orientation.Vertical, SplitterWidth = 6 };
             split1.HandleCreated += (s, e) => SafeInitSplit1();
             table.Controls.Add(split1, 0, 1);
 
-            // Left: list
             lvFiles1 = new WinForms.ListView { Dock = WinForms.DockStyle.Fill, View = WinForms.View.Details, FullRowSelect = true, HideSelection = false, MultiSelect = false, BorderStyle = WinForms.BorderStyle.FixedSingle };
             lvFiles1.Columns.Add("File", 460);
             lvFiles1.Columns.Add("Duration", 120);
@@ -272,7 +267,6 @@ namespace MKVRenamer
             split1.Panel1.Controls.Add(lvFiles1);
             split1.Panel1.Controls.Add(pnlLeftBottom);
 
-            // Right: extras
             var rightTop = new WinForms.FlowLayoutPanel { Dock = WinForms.DockStyle.Top, Height = 46, FlowDirection = WinForms.FlowDirection.LeftToRight, WrapContents = false, Padding = new WinForms.Padding(6, 10, 6, 0) };
             chkHasExtras1 = new WinForms.CheckBox { Text = "I have extras to add", AutoSize = true };
             chkHasExtras1.CheckedChanged += (s, e) => clbExtras1.Enabled = chkHasExtras1.Checked;
@@ -281,7 +275,6 @@ namespace MKVRenamer
             btnExecute1 = new ModernButton { Text = "Rename / Move" }; btnExecute1.AutoSize = false; btnExecute1.Height = 44; btnExecute1.MinimumSize = new Drawing.Size(0, 44); btnExecute1.Dock = WinForms.DockStyle.Bottom; btnExecute1.Click += BtnExecute1_Click;
             split1.Panel2.Controls.Add(clbExtras1); split1.Panel2.Controls.Add(btnExecute1); split1.Panel2.Controls.Add(rightTop);
 
-            // Log
             txtLog1 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, Multiline = false, ReadOnly = true, BorderStyle = WinForms.BorderStyle.FixedSingle };
             table.Controls.Add(txtLog1, 0, 2);
         }
@@ -380,7 +373,7 @@ namespace MKVRenamer
             folderRow2.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
             folderRow2.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             txtFolder2 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, ReadOnly = true, PlaceholderText = "Select folder with extras" };
-            btnBrowse2 = new ModernButton { Text = "Browse�" }; btnBrowse2.Click += BtnBrowse2_Click;
+            btnBrowse2 = new ModernButton { Text = "Browse…" }; btnBrowse2.Click += BtnBrowse2_Click;
             folderRow2.Controls.Add(txtFolder2, 0, 0); folderRow2.Controls.Add(btnBrowse2, 1, 0);
             table.Controls.Add(folderRow2, 0, 0);
 
@@ -434,7 +427,6 @@ namespace MKVRenamer
             var items = lstFiles2.SelectedItems.Count > 0 ? lstFiles2.SelectedItems.Cast<object>().Select(o => o!.ToString()).Where(s => !string.IsNullOrEmpty(s)).Cast<string>().ToList() : lstFiles2.Items.Cast<object>().Select(o => o!.ToString()).Where(s => !string.IsNullOrEmpty(s)).Cast<string>().ToList();
             if (items.Count == 0) { WinForms.MessageBox.Show(this, "There are no files to rename.", "Nothing to do", WinForms.MessageBoxButtons.OK, WinForms.MessageBoxIcon.Information); return; }
             var prefix = txtPrefix2.Text ?? string.Empty; int start = (int)numStart2.Value;
-            // Auto pad width: at least 2, or enough digits to cover the last index
             int maxIndex = start + items.Count - 1; int padWidth = Math.Max(2, maxIndex.ToString().Length);
             int idx = start; int renamed = 0;
             try
@@ -467,7 +459,7 @@ namespace MKVRenamer
             row1.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
             row1.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             txtParent3 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, ReadOnly = true, PlaceholderText = "Choose where to create the new movie folder" };
-            btnBrowse3 = new ModernButton { Text = "Browse�" }; btnBrowse3.Click += BtnBrowse3_Click;
+            btnBrowse3 = new ModernButton { Text = "Browse…" }; btnBrowse3.Click += BtnBrowse3_Click;
             row1.Controls.Add(txtParent3, 0, 0); row1.Controls.Add(btnBrowse3, 1, 0); table.Controls.Add(row1, 0, 0);
 
             var row2 = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Top, ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0, 8, 0, 0) };

@@ -10,6 +10,10 @@
 		<Product>MKV Organizer</Product>
 		<!-- optional -->
 		<Company>BananaRhino</Company>
+		<ApplicationIcon>App.ico</ApplicationIcon>
 		<!-- optional -->
 	</PropertyGroup>
+	<ItemGroup>
+	  <Content Include="App.ico" />
+	</ItemGroup>
 </Project>
