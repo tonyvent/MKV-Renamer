@@ -1,79 +1,74 @@
-MKV Renamer
+# MKV Renamer
 
 A fast, friendly Windows app for organizing movie folders:
 
-Rename the main movie to match its folder (e.g., Austin Powers Goldmember (2002).mkv)
+- Rename the **main movie** to match its folder (e.g., `Austin Powers Goldmember (2002).mkv`)
+- Move selected files into an **Extras** subfolder
+- Batch-rename extras (`Extras - 01.mkv`, `Extras - 02.mkv`, … or any prefix you choose)
+- Create new movie folders (optionally with an `Extras` subfolder)
+- Modern, clean UI with a deep-green accent and rounded buttons
 
-Move selected files into an Extras subfolder
+> ✅ **Privacy-friendly:** No internet access. The app only reads/writes files you select.
 
-Batch-rename extras (Extras - 01.mkv, Extras - 02.mkv, … or any prefix you choose)
+---
 
-Create new movie folders (optionally with an Extras subfolder)
+## Quick Start
 
-Modern, clean UI with a deep-green accent and rounded buttons
+### Main & Extras
+1. Click **Browse…** and pick a movie folder (named like `Title (Year)`).
+2. Select the movie file, click **Set Selected as Main**.  
+   It will be renamed to exactly the same as the folder (plus `.mkv`).
+3. *(Optional)* Check **I have extras to add**, pick extra files, then **Rename / Move** to create `Extras` and move them.
 
-✅ No internet access. The app only reads/writes files you select.
+### Rename Extras
+1. Choose a folder with extra MKVs.
+2. *(Optional)* Multi-select files to rename only those; none selected = all.
+3. Set your **Prefix** (default `Extras - `) and **Start** number, then click **Rename**.
 
-Quick Start
+### New Movie Folder
+1. Pick the **parent directory**.
+2. Enter **Folder name** (e.g., `Movie Title (2025)`).
+3. *(Optional)* Check **Also create Extras subfolder**, then **Create Folder**.
 
-Main & Extras
+---
 
-Click Browse… and pick a movie folder (named like Title (Year)).
+## Why it’s Safe
 
-Select the movie file, click Set Selected as Main.
-It will be renamed to exactly the same as the folder (plus .mkv).
+- **No overwrites:** If a destination name already exists, the app auto-appends ` (1)`, ` (2)`, … to keep files safe.
+- **Only what you choose:** It touches only files you explicitly select or the `.mkv` files in the chosen folder.
+- **No background tasks:** Everything runs when you click the button.
 
-(Optional) Check I have extras to add, pick extra files, then Rename / Move to create Extras and move them.
+---
 
-Rename Extras
+## Features
 
-Choose a folder with extra MKVs.
+- **Duration column** in the main list to help pick the real movie file
+- **Modern UI** (rounded buttons, spacing, clean color palette)
+- **Portable** (single folder; no installer required)
+- **Windows Shell integration** (uses shell properties for duration)
+- **MKV-focused** (keeps the app simple and predictable)
 
-(Optional) multi-select files to rename only those; none selected = all.
+---
 
-Set your Prefix (default Extras - ) and Start number, then Rename.
+## Screenshots
 
-New Movie Folder
+> Add these later in `docs/` and update the paths.
 
-Pick the parent directory, enter Folder name (e.g., Movie Title (2025)), optionally check Also create Extras subfolder, hit Create Folder.
-
-Why it’s safe
-
-No overwrites: If a destination name already exists, the app auto-appends (1), (2), … to keep files safe.
-
-Only what you choose: It touches only files you explicitly select or the .mkv files in the chosen folder.
-
-No background tasks: Everything runs when you click the button.
-
-Features
-
-Duration column in the main list to help pick the real movie file
-
-Modern UI (rounded buttons, spacing, clean color palette)
-
-Portable (single folder; no installer required)
-
-Windows Shell integration (uses shell properties for duration)
-
-MKV-focused (keeps the app simple and predictable)
-
-Screenshots
-
-Add these later in docs/ and update the paths:
-
-Main & Extras
+**Main & Extras**  
 ![Main view](docs/screenshot-main.png)
 
-Rename Extras
+**Rename Extras**  
 ![Rename Extras](docs/screenshot-rename.png)
 
-New Movie Folder
+**New Movie Folder**  
 ![New Folder](docs/screenshot-newfolder.png)
 
-Known Limitations
+---
 
-Targets .mkv files (by design).
+## Known Limitations
 
-Duration comes from Windows Shell; some unusual files may show blank.
+- Targets `.mkv` files (by design).
+- Duration comes from Windows Shell; some unusual files may show blank.
+- Operates on the **selected folder only** (no recursive subfolders).
 
-Operates on the selected folder only (no recursive subfolders).
+---
