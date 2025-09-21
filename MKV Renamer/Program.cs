@@ -377,7 +377,7 @@ namespace MKVRenamer
                 int min2 = Math.Min(300, Math.Max(0, split1.Width / 3));
                 split1.Panel1MinSize = min1; split1.Panel2MinSize = min2;
                 int maxAllowed = split1.Width - split1.Panel2MinSize;
-                int desired = Math.Clamp(split1.Width / 2, split1.Panel1MinSize, Math.max(split1.Panel1MinSize, maxAllowed - 1));
+                int desired = Math.Clamp(split1.Width / 2, split1.Panel1MinSize, Math.Max(split1.Panel1MinSize, maxAllowed - 1));
                 split1.SplitterDistance = desired;
             }
             catch { }
@@ -850,7 +850,7 @@ namespace MKVRenamer
                     };
                     AddEpisodeToList(epi);
                 }
-                txtLogTV.Text = files.Length == 0 ? "No .mkv files at the top level." : $"Loaded {files.length} file(s).";
+                txtLogTV.Text = files.Length == 0 ? "No .mkv files at the top level." : $"Loaded {files.Length} file(s).";
                 AutoSizeColumnsTV();
             }
             finally { lvTV.EndUpdate(); }
