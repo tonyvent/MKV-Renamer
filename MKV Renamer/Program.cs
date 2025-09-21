@@ -675,16 +675,14 @@ namespace MKVRenamer
             };
             seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // label
             seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // numeric up/down
-            seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // button keeps natural width
+            seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));     // button stretches with window
             var lblSeasons = new WinForms.Label { AutoSize = true, Text = "Seasons:", Margin = new WinForms.Padding(0, 6, 8, 6) };
             numSeasonsTV = new WinForms.NumericUpDown { Minimum = 1, Maximum = 99, Value = 1, Width = 72, Margin = new WinForms.Padding(0, 2, 10, 2) };
             btnCreateSeasonsTV = new ModernButton { Text = "Create Season Folders" };
             btnCreateSeasonsTV.UseDefaultMargin = false;
-            btnCreateSeasonsTV.AutoSize = true;
-            btnCreateSeasonsTV.AutoSizeMode = WinForms.AutoSizeMode.GrowAndShrink;
+            btnCreateSeasonsTV.AutoSize = false;
+            btnCreateSeasonsTV.Dock = WinForms.DockStyle.Fill;
             btnCreateSeasonsTV.MinimumSize = new Drawing.Size(0, 44);
-            btnCreateSeasonsTV.Height = 44;
-            btnCreateSeasonsTV.Anchor = WinForms.AnchorStyles.Left;
             btnCreateSeasonsTV.Margin = new WinForms.Padding(0);
             btnCreateSeasonsTV.Click += BtnCreateSeasonsTV_Click;
 
