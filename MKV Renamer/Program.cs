@@ -44,6 +44,7 @@ namespace MKVRenamer
         {
             public int CornerRadius { get; set; } = 14;
             private bool _hover, _pressed;
+            public bool UseDefaultMargin { get; set; } = true;
             public ModernButton()
             {
                 SetStyle(WinForms.ControlStyles.AllPaintingInWmPaint | WinForms.ControlStyles.UserPaint | WinForms.ControlStyles.OptimizedDoubleBuffer, true);
@@ -107,6 +108,16 @@ namespace MKVRenamer
             {
                 switch (c)
                 {
+                    case ModernButton mb:
+                        mb.FlatStyle = WinForms.FlatStyle.Flat;
+                        mb.FlatAppearance.BorderSize = 0;
+                        mb.BackColor = Theme.Accent;
+                        mb.ForeColor = Theme.TextOnAccent;
+                        mb.Font = new Drawing.Font("Segoe UI Semibold", 10.5F);
+                        mb.Padding = new WinForms.Padding(16, 10, 16, 10);
+                        if (mb.UseDefaultMargin) mb.Margin = new WinForms.Padding(6);
+                        break;
+
                     case WinForms.Button b:
                         b.FlatStyle = WinForms.FlatStyle.Flat;
                         b.FlatAppearance.BorderSize = 0;
@@ -366,7 +377,7 @@ namespace MKVRenamer
                 int min2 = Math.Min(300, Math.Max(0, split1.Width / 3));
                 split1.Panel1MinSize = min1; split1.Panel2MinSize = min2;
                 int maxAllowed = split1.Width - split1.Panel2MinSize;
-                int desired = Math.Clamp(split1.Width / 2, split1.Panel1MinSize, Math.max(split1.Panel1MinSize, maxAllowed - 1));
+                int desired = Math.Clamp(split1.Width / 2, split1.Panel1MinSize, Math.Max(split1.Panel1MinSize, maxAllowed - 1));
                 split1.SplitterDistance = desired;
             }
             catch { }
@@ -593,7 +604,7 @@ namespace MKVRenamer
             table.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.AutoSize));           // top controls
             table.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.Percent, 100F));      // list
             table.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.AutoSize));           // assign row
-            table.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.Absolute, 40F));      // bottom (button + log)
+            table.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.AutoSize));           // bottom (button + log)
             tabTV.Controls.Clear();
             tabTV.Controls.Add(table);
 
@@ -616,7 +627,7 @@ namespace MKVRenamer
             };
             topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 45F));
             topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 35F));
-            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 20F));
+            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             topBarOuter.Controls.Add(topBar);
 
             WinForms.Panel Card() => new WinForms.Panel
@@ -664,13 +675,14 @@ namespace MKVRenamer
             };
             seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // label
             seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // numeric up/down
-            seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));     // button stretches
+            seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // button keeps natural width
             var lblSeasons = new WinForms.Label { AutoSize = true, Text = "Seasons:", Margin = new WinForms.Padding(0, 6, 8, 6) };
             numSeasonsTV = new WinForms.NumericUpDown { Minimum = 1, Maximum = 99, Value = 1, Width = 72, Margin = new WinForms.Padding(0, 2, 10, 2) };
             btnCreateSeasonsTV = new ModernButton { Text = "Create Season Folders" };
+            btnCreateSeasonsTV.UseDefaultMargin = false;
             // important: keep the button inside its cell
             btnCreateSeasonsTV.AutoSize = false;
-            btnCreateSeasonsTV.MinimumSize = new Drawing.Size(0, 44);
+            btnCreateSeasonsTV.MinimumSize = new Drawing.Size(220, 44);
             btnCreateSeasonsTV.Height = 44;
             btnCreateSeasonsTV.Dock = WinForms.DockStyle.Fill;
             btnCreateSeasonsTV.Margin = new WinForms.Padding(0, 0, 0, 0);
@@ -721,10 +733,12 @@ namespace MKVRenamer
             cboSeasonTV.SelectedIndex = 0;
 
             btnAssignSeasonTV = new ModernButton { Text = "Set Season for Selected" };
+            btnAssignSeasonTV.UseDefaultMargin = false;
             btnAssignSeasonTV.Margin = new WinForms.Padding(6, 2, 6, 2);
             btnAssignSeasonTV.Click += BtnAssignSeasonTV_Click;
 
             btnEditTitleTV = new ModernButton { Text = "Edit Episode Title…" };
+            btnEditTitleTV.UseDefaultMargin = false;
             btnEditTitleTV.Margin = new WinForms.Padding(6, 2, 0, 2);
             btnEditTitleTV.Click += BtnEditTitleTV_Click;
 
@@ -747,6 +761,7 @@ namespace MKVRenamer
             bottomRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
 
             btnMoveRenameTV = new ModernButton { Text = "Move & Rename (Seasons)" };
+            btnMoveRenameTV.UseDefaultMargin = false;
             btnMoveRenameTV.Margin = new WinForms.Padding(0, 0, 10, 0);
             btnMoveRenameTV.AutoSize = false;
             btnMoveRenameTV.MinimumSize = new Drawing.Size(220, 44);
@@ -835,7 +850,7 @@ namespace MKVRenamer
                     };
                     AddEpisodeToList(epi);
                 }
-                txtLogTV.Text = files.Length == 0 ? "No .mkv files at the top level." : $"Loaded {files.length} file(s).";
+                txtLogTV.Text = files.Length == 0 ? "No .mkv files at the top level." : $"Loaded {files.Length} file(s).";
                 AutoSizeColumnsTV();
             }
             finally { lvTV.EndUpdate(); }
