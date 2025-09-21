@@ -612,7 +612,7 @@ namespace MKVRenamer
             var topBarOuter = new WinForms.Panel
             {
                 Dock = WinForms.DockStyle.Fill,
-                Padding = new WinForms.Padding(12, 12, 12, 8), // a little more breathing room
+                Padding = new WinForms.Padding(16, 14, 16, 10), // a little more breathing room
                 Margin = WinForms.Padding.Empty
             };
             table.Controls.Add(topBarOuter, 0, 0);
@@ -622,20 +622,20 @@ namespace MKVRenamer
                 Dock = WinForms.DockStyle.Fill,
                 ColumnCount = 3,
                 AutoSize = false,
-                Padding = new WinForms.Padding(6),
+                Padding = new WinForms.Padding(10, 8, 10, 8),
                 Margin = WinForms.Padding.Empty
             };
-            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 45F));
-            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 35F));
-            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
+            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 40F));
+            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 30F));
+            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 30F));
             topBarOuter.Controls.Add(topBar);
 
             WinForms.Panel Card() => new WinForms.Panel
             {
                 BackColor = Theme.Surface,
                 Dock = WinForms.DockStyle.Fill,
-                Padding = new WinForms.Padding(12),
-                Margin = new WinForms.Padding(6, 0, 6, 0)
+                Padding = new WinForms.Padding(16, 12, 16, 12),
+                Margin = new WinForms.Padding(10, 0, 10, 0)
             };
 
             // Folder card
@@ -663,7 +663,7 @@ namespace MKVRenamer
             cardSeries.Controls.Add(seriesRow);
             topBar.Controls.Add(cardSeries, 1, 0);
 
-            // Seasons card (FIXED LAYOUT)
+            // Seasons card (stretches with window)
             var cardSeasons = Card();
             var seasonsRow = new WinForms.TableLayoutPanel
             {
@@ -675,17 +675,16 @@ namespace MKVRenamer
             };
             seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // label
             seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // numeric up/down
-            seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // button keeps natural width
-            var lblSeasons = new WinForms.Label { AutoSize = true, Text = "Seasons:", Margin = new WinForms.Padding(0, 6, 8, 6) };
-            numSeasonsTV = new WinForms.NumericUpDown { Minimum = 1, Maximum = 99, Value = 1, Width = 72, Margin = new WinForms.Padding(0, 2, 10, 2) };
+            seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));     // button stretches with layout
+            var lblSeasons = new WinForms.Label { AutoSize = true, Text = "Seasons:", Margin = new WinForms.Padding(0, 8, 12, 6) };
+            numSeasonsTV = new WinForms.NumericUpDown { Minimum = 1, Maximum = 99, Value = 1, Width = 84, Margin = new WinForms.Padding(0, 4, 16, 4) };
             btnCreateSeasonsTV = new ModernButton { Text = "Create Season Folders" };
             btnCreateSeasonsTV.UseDefaultMargin = false;
-            // important: keep the button inside its cell
             btnCreateSeasonsTV.AutoSize = false;
             btnCreateSeasonsTV.MinimumSize = new Drawing.Size(220, 44);
             btnCreateSeasonsTV.Height = 44;
             btnCreateSeasonsTV.Dock = WinForms.DockStyle.Fill;
-            btnCreateSeasonsTV.Margin = new WinForms.Padding(0, 0, 0, 0);
+            btnCreateSeasonsTV.Margin = new WinForms.Padding(0);
             btnCreateSeasonsTV.Click += BtnCreateSeasonsTV_Click;
 
             seasonsRow.Controls.Add(lblSeasons, 0, 0);
