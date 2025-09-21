@@ -52,8 +52,6 @@ A fast, friendly Windows app for organizing movie folders:
 
 ## Screenshots
 
-> Add these later in `docs/` and update the paths.
-
 **Main & Extras**  
 ![Main view](Docs/screenshot-main.png)
 
