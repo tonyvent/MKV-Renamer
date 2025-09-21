@@ -612,7 +612,7 @@ namespace MKVRenamer
             var topBarOuter = new WinForms.Panel
             {
                 Dock = WinForms.DockStyle.Fill,
-                Padding = new WinForms.Padding(12, 12, 12, 8), // a little more breathing room
+                Padding = new WinForms.Padding(12),
                 Margin = WinForms.Padding.Empty
             };
             table.Controls.Add(topBarOuter, 0, 0);
@@ -620,14 +620,16 @@ namespace MKVRenamer
             var topBar = new WinForms.TableLayoutPanel
             {
                 Dock = WinForms.DockStyle.Fill,
-                ColumnCount = 3,
+                ColumnCount = 1,
+                RowCount = 3,
                 AutoSize = false,
-                Padding = new WinForms.Padding(6),
+                Padding = WinForms.Padding.Empty,
                 Margin = WinForms.Padding.Empty
             };
-            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 45F));
-            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 35F));
-            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 20F));
+            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
+            topBar.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.AutoSize));
+            topBar.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.AutoSize));
+            topBar.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.AutoSize));
             topBarOuter.Controls.Add(topBar);
 
             WinForms.Panel Card() => new WinForms.Panel
@@ -635,7 +637,7 @@ namespace MKVRenamer
                 BackColor = Theme.Surface,
                 Dock = WinForms.DockStyle.Fill,
                 Padding = new WinForms.Padding(12),
-                Margin = new WinForms.Padding(6, 0, 6, 0)
+                Margin = new WinForms.Padding(0, 0, 0, 12)
             };
 
             // Folder card
@@ -661,7 +663,7 @@ namespace MKVRenamer
             seriesRow.Controls.Add(lblSeries, 0, 0);
             seriesRow.Controls.Add(txtSeriesTitleTV, 1, 0);
             cardSeries.Controls.Add(seriesRow);
-            topBar.Controls.Add(cardSeries, 1, 0);
+            topBar.Controls.Add(cardSeries, 0, 1);
 
             // Seasons card (FIXED LAYOUT)
             var cardSeasons = Card();
@@ -675,24 +677,23 @@ namespace MKVRenamer
             };
             seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // label
             seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // numeric up/down
-            seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // button keeps natural width
-            var lblSeasons = new WinForms.Label { AutoSize = true, Text = "Seasons:", Margin = new WinForms.Padding(0, 6, 8, 6) };
-            numSeasonsTV = new WinForms.NumericUpDown { Minimum = 1, Maximum = 99, Value = 1, Width = 72, Margin = new WinForms.Padding(0, 2, 10, 2) };
+            seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));     // button stretches with window
+            var lblSeasons = new WinForms.Label { AutoSize = true, Text = "Seasons:", Margin = new WinForms.Padding(0, 8, 12, 8) };
+            numSeasonsTV = new WinForms.NumericUpDown { Minimum = 1, Maximum = 99, Value = 1, Width = 72, Margin = new WinForms.Padding(0, 6, 12, 6) };
             btnCreateSeasonsTV = new ModernButton { Text = "Create Season Folders" };
             btnCreateSeasonsTV.UseDefaultMargin = false;
-            btnCreateSeasonsTV.AutoSize = true;
-            btnCreateSeasonsTV.AutoSizeMode = WinForms.AutoSizeMode.GrowAndShrink;
+            btnCreateSeasonsTV.AutoSize = false;
+            btnCreateSeasonsTV.Dock = WinForms.DockStyle.Fill;
             btnCreateSeasonsTV.MinimumSize = new Drawing.Size(0, 44);
-            btnCreateSeasonsTV.Height = 44;
-            btnCreateSeasonsTV.Anchor = WinForms.AnchorStyles.Left;
-            btnCreateSeasonsTV.Margin = new WinForms.Padding(0);
+            btnCreateSeasonsTV.Margin = new WinForms.Padding(0, 6, 0, 6);
             btnCreateSeasonsTV.Click += BtnCreateSeasonsTV_Click;
 
             seasonsRow.Controls.Add(lblSeasons, 0, 0);
             seasonsRow.Controls.Add(numSeasonsTV, 1, 0);
             seasonsRow.Controls.Add(btnCreateSeasonsTV, 2, 0);
             cardSeasons.Controls.Add(seasonsRow);
-            topBar.Controls.Add(cardSeasons, 2, 0);
+            cardSeasons.Margin = WinForms.Padding.Empty;
+            topBar.Controls.Add(cardSeasons, 0, 2);
 
             // ---------- LIST (episodes) ----------
             lvTV = new WinForms.ListView
@@ -703,7 +704,7 @@ namespace MKVRenamer
                 HideSelection = false,
                 MultiSelect = true,
                 BorderStyle = WinForms.BorderStyle.FixedSingle,
-                Margin = new WinForms.Padding(12, 0, 12, 0)
+                Margin = new WinForms.Padding(12, 0, 12, 12)
             };
             lvTV.Columns.Add("File", 360);
             lvTV.Columns.Add("Season", 80);
@@ -719,27 +720,29 @@ namespace MKVRenamer
                 Dock = WinForms.DockStyle.Fill,
                 ColumnCount = 4,
                 AutoSize = false,
-                Padding = new WinForms.Padding(12, 8, 12, 8),
-                Margin = WinForms.Padding.Empty
+                Padding = new WinForms.Padding(12),
+                Margin = new WinForms.Padding(0, 0, 0, 12)
             };
             assignRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             assignRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             assignRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             assignRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
 
-            var lblAssign = new WinForms.Label { AutoSize = true, Text = "Assign to season:", Margin = new WinForms.Padding(0, 10, 10, 6) };
-            cboSeasonTV = new WinForms.ComboBox { DropDownStyle = WinForms.ComboBoxStyle.DropDownList, Width = 140, Margin = new WinForms.Padding(0, 6, 10, 6) };
+            var lblAssign = new WinForms.Label { AutoSize = true, Text = "Assign to season:", Margin = new WinForms.Padding(0, 10, 12, 6) };
+            cboSeasonTV = new WinForms.ComboBox { DropDownStyle = WinForms.ComboBoxStyle.DropDownList, Width = 140, Margin = new WinForms.Padding(0, 6, 12, 6) };
             cboSeasonTV.Items.AddRange(Enumerable.Range(1, 99).Select(i => (object)$"Season {i}").ToArray());
             cboSeasonTV.SelectedIndex = 0;
 
             btnAssignSeasonTV = new ModernButton { Text = "Set Season for Selected" };
             btnAssignSeasonTV.UseDefaultMargin = false;
-            btnAssignSeasonTV.Margin = new WinForms.Padding(6, 2, 6, 2);
+            btnAssignSeasonTV.Margin = new WinForms.Padding(0, 6, 12, 6);
+            btnAssignSeasonTV.Anchor = WinForms.AnchorStyles.Left;
             btnAssignSeasonTV.Click += BtnAssignSeasonTV_Click;
 
             btnEditTitleTV = new ModernButton { Text = "Edit Episode Title…" };
             btnEditTitleTV.UseDefaultMargin = false;
-            btnEditTitleTV.Margin = new WinForms.Padding(6, 2, 0, 2);
+            btnEditTitleTV.Margin = new WinForms.Padding(0, 6, 0, 6);
+            btnEditTitleTV.Anchor = WinForms.AnchorStyles.Right;
             btnEditTitleTV.Click += BtnEditTitleTV_Click;
 
             assignRow.Controls.Add(lblAssign, 0, 0);
@@ -754,7 +757,7 @@ namespace MKVRenamer
                 Dock = WinForms.DockStyle.Fill,
                 ColumnCount = 2,
                 RowCount = 1,
-                Padding = new WinForms.Padding(12, 0, 12, 8),
+                Padding = new WinForms.Padding(12, 0, 12, 12),
                 Margin = WinForms.Padding.Empty
             };
             bottomRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
@@ -762,7 +765,7 @@ namespace MKVRenamer
 
             btnMoveRenameTV = new ModernButton { Text = "Move & Rename (Seasons)" };
             btnMoveRenameTV.UseDefaultMargin = false;
-            btnMoveRenameTV.Margin = new WinForms.Padding(0, 0, 10, 0);
+            btnMoveRenameTV.Margin = new WinForms.Padding(0, 6, 12, 6);
             btnMoveRenameTV.AutoSize = false;
             btnMoveRenameTV.MinimumSize = new Drawing.Size(220, 44);
             btnMoveRenameTV.Height = 44;
