@@ -156,12 +156,38 @@ namespace MKVRenamer
 
                     case WinForms.Panel or WinForms.TableLayoutPanel or WinForms.FlowLayoutPanel:
                         c.BackColor = Theme.Surface;
-                        c.Margin = WinForms.Padding.Empty; // containers don't push out
                         break;
                 }
 
                 ApplyThemeRecursive(c);
             }
+        }
+
+        private static WinForms.TableLayoutPanel CreateSection(WinForms.Control child,
+            WinForms.Padding? padding = null,
+            WinForms.Padding? margin = null,
+            bool fillChild = true,
+            bool autoSize = true)
+        {
+            var section = new WinForms.TableLayoutPanel
+            {
+                ColumnCount = 1,
+                RowCount = 1,
+                Dock = WinForms.DockStyle.Fill,
+                Padding = padding ?? new WinForms.Padding(18),
+                Margin = margin ?? new WinForms.Padding(0, 0, 0, 12),
+                AutoSize = autoSize,
+                AutoSizeMode = autoSize ? WinForms.AutoSizeMode.GrowAndShrink : WinForms.AutoSizeMode.GrowOnly,
+                BackColor = Theme.Surface
+            };
+
+            section.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
+            section.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.Percent, 100F));
+
+            if (fillChild) child.Dock = WinForms.DockStyle.Fill;
+            section.Controls.Add(child, 0, 0);
+
+            return section;
         }
 
         // ===== SHARED HELPERS =====
@@ -329,43 +355,87 @@ namespace MKVRenamer
             table.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.Absolute, 40));
             tabMain.Controls.Clear(); tabMain.Controls.Add(table);
 
-            var folderRow1 = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Top, ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(2), Margin = WinForms.Padding.Empty };
+            var folderRow1 = new WinForms.TableLayoutPanel { ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0), Margin = WinForms.Padding.Empty };
             folderRow1.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
             folderRow1.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             txtFolder1 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, ReadOnly = true, PlaceholderText = "Select a movie folder (e.g., Austin Powers Goldmember (2002))" };
-            btnBrowse1 = new ModernButton { Text = "Browse…" }; btnBrowse1.Click += BtnBrowse1_Click;
-            folderRow1.Controls.Add(txtFolder1, 0, 0); folderRow1.Controls.Add(btnBrowse1, 1, 0);
-            table.Controls.Add(folderRow1, 0, 0);
+            btnBrowse1 = new ModernButton { Text = "Browse…" };
+            btnBrowse1.Click += BtnBrowse1_Click;
+            folderRow1.Controls.Add(txtFolder1, 0, 0);
+            folderRow1.Controls.Add(btnBrowse1, 1, 0);
+            table.Controls.Add(CreateSection(folderRow1, new WinForms.Padding(20, 18, 20, 12)), 0, 0);
 
             split1 = new WinForms.SplitContainer { Dock = WinForms.DockStyle.Fill, Orientation = WinForms.Orientation.Vertical, SplitterWidth = 6 };
             split1.HandleCreated += (s, e) => SafeInitSplit1();
-            table.Controls.Add(split1, 0, 1);
+            split1.Panel1.Padding = new WinForms.Padding(16, 16, 16, 10);
+            split1.Panel2.Padding = new WinForms.Padding(16, 16, 16, 10);
+            split1.Panel1.BackColor = Theme.Surface;
+            split1.Panel2.BackColor = Theme.Surface;
 
-            lvFiles1 = new WinForms.ListView { Dock = WinForms.DockStyle.Fill, View = WinForms.View.Details, FullRowSelect = true, HideSelection = false, MultiSelect = false, BorderStyle = WinForms.BorderStyle.FixedSingle, Margin = WinForms.Padding.Empty };
+            lvFiles1 = new WinForms.ListView { View = WinForms.View.Details, FullRowSelect = true, HideSelection = false, MultiSelect = false, BorderStyle = WinForms.BorderStyle.FixedSingle };
             lvFiles1.Columns.Add("File", 460);
             lvFiles1.Columns.Add("Duration", 120);
-            var pnlLeftBottom = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Bottom, ColumnCount = 1, RowCount = 2, AutoSize = true, Padding = new WinForms.Padding(6), Margin = WinForms.Padding.Empty };
+
+            var pnlLeftBottom = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Bottom, ColumnCount = 1, RowCount = 2, AutoSize = true, Padding = new WinForms.Padding(0), Margin = new WinForms.Padding(0, 14, 0, 0) };
             pnlLeftBottom.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.AutoSize));
             pnlLeftBottom.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.AutoSize));
             btnSetMain1 = new ModernButton { Text = "Set Selected as Main" };
-            btnSetMain1.AutoSize = false; btnSetMain1.Dock = WinForms.DockStyle.Top; btnSetMain1.Height = 44; btnSetMain1.MinimumSize = new Drawing.Size(0, 44);
+            btnSetMain1.UseDefaultMargin = false;
+            btnSetMain1.Margin = new WinForms.Padding(0, 0, 0, 12);
+            btnSetMain1.AutoSize = false;
+            btnSetMain1.Dock = WinForms.DockStyle.Top;
+            btnSetMain1.Height = 44;
+            btnSetMain1.MinimumSize = new Drawing.Size(0, 44);
             btnSetMain1.Click += BtnSetMain1_Click;
-            lblMain1 = new WinForms.Label { Text = "Main movie: (none)", Dock = WinForms.DockStyle.Top, AutoSize = false, Height = 48, Padding = new WinForms.Padding(10), BorderStyle = WinForms.BorderStyle.FixedSingle, TextAlign = Drawing.ContentAlignment.MiddleLeft, Margin = new WinForms.Padding(0, 6, 0, 0) };
+            lblMain1 = new WinForms.Label
+            {
+                Text = "Main movie: (none)",
+                Dock = WinForms.DockStyle.Top,
+                AutoSize = false,
+                Height = 56,
+                Padding = new WinForms.Padding(14, 12, 14, 12),
+                BorderStyle = WinForms.BorderStyle.FixedSingle,
+                TextAlign = Drawing.ContentAlignment.MiddleLeft
+            };
             pnlLeftBottom.Controls.Add(btnSetMain1, 0, 0);
             pnlLeftBottom.Controls.Add(lblMain1, 0, 1);
+
+            lvFiles1.Dock = WinForms.DockStyle.Fill;
             split1.Panel1.Controls.Add(lvFiles1);
             split1.Panel1.Controls.Add(pnlLeftBottom);
 
-            var rightTop = new WinForms.FlowLayoutPanel { Dock = WinForms.DockStyle.Top, Height = 46, FlowDirection = WinForms.FlowDirection.LeftToRight, WrapContents = false, Padding = new WinForms.Padding(6, 10, 6, 0), Margin = WinForms.Padding.Empty };
-            chkHasExtras1 = new WinForms.CheckBox { Text = "I have extras to add", AutoSize = true };
+            var rightTop = new WinForms.FlowLayoutPanel
+            {
+                Dock = WinForms.DockStyle.Top,
+                Height = 48,
+                FlowDirection = WinForms.FlowDirection.LeftToRight,
+                WrapContents = false,
+                Padding = new WinForms.Padding(0, 4, 0, 6),
+                Margin = new WinForms.Padding(0, 0, 0, 12)
+            };
+            chkHasExtras1 = new WinForms.CheckBox { Text = "I have extras to add", AutoSize = true, Margin = new WinForms.Padding(0) };
             chkHasExtras1.CheckedChanged += (s, e) => clbExtras1.Enabled = chkHasExtras1.Checked;
             rightTop.Controls.Add(chkHasExtras1);
-            clbExtras1 = new WinForms.CheckedListBox { Dock = WinForms.DockStyle.Fill, Enabled = false, CheckOnClick = true, BorderStyle = WinForms.BorderStyle.FixedSingle, Margin = WinForms.Padding.Empty };
-            btnExecute1 = new ModernButton { Text = "Rename / Move" }; btnExecute1.AutoSize = false; btnExecute1.Height = 44; btnExecute1.MinimumSize = new Drawing.Size(0, 44); btnExecute1.Dock = WinForms.DockStyle.Bottom; btnExecute1.Click += BtnExecute1_Click;
-            split1.Panel2.Controls.Add(clbExtras1); split1.Panel2.Controls.Add(btnExecute1); split1.Panel2.Controls.Add(rightTop);
 
-            txtLog1 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, Multiline = false, ReadOnly = true, BorderStyle = WinForms.BorderStyle.FixedSingle, Margin = WinForms.Padding.Empty };
-            table.Controls.Add(txtLog1, 0, 2);
+            clbExtras1 = new WinForms.CheckedListBox { Dock = WinForms.DockStyle.Fill, Enabled = false, CheckOnClick = true, BorderStyle = WinForms.BorderStyle.FixedSingle };
+
+            btnExecute1 = new ModernButton { Text = "Rename / Move" };
+            btnExecute1.UseDefaultMargin = false;
+            btnExecute1.Margin = new WinForms.Padding(0);
+            btnExecute1.AutoSize = false;
+            btnExecute1.Height = 46;
+            btnExecute1.MinimumSize = new Drawing.Size(0, 46);
+            btnExecute1.Dock = WinForms.DockStyle.Bottom;
+            btnExecute1.Click += BtnExecute1_Click;
+
+            split1.Panel2.Controls.Add(clbExtras1);
+            split1.Panel2.Controls.Add(btnExecute1);
+            split1.Panel2.Controls.Add(rightTop);
+
+            table.Controls.Add(CreateSection(split1, new WinForms.Padding(18, 16, 18, 16), new WinForms.Padding(0, 0, 0, 12), autoSize: false), 0, 1);
+
+            txtLog1 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, Multiline = false, ReadOnly = true, BorderStyle = WinForms.BorderStyle.FixedSingle };
+            table.Controls.Add(CreateSection(txtLog1, new WinForms.Padding(18, 6, 18, 6), new WinForms.Padding(0)), 0, 2);
         }
 
         private void SafeInitSplit1()
@@ -458,42 +528,59 @@ namespace MKVRenamer
             table.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.Absolute, 40));
             tabRenamer.Controls.Clear(); tabRenamer.Controls.Add(table);
 
-            var folderRow2 = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Top, ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(2), Margin = WinForms.Padding.Empty };
+            var folderRow2 = new WinForms.TableLayoutPanel { ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0), Margin = WinForms.Padding.Empty };
             folderRow2.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
             folderRow2.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             txtFolder2 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, ReadOnly = true, PlaceholderText = "Select folder with extras" };
-            btnBrowse2 = new ModernButton { Text = "Browse…" }; btnBrowse2.Click += BtnBrowse2_Click;
-            folderRow2.Controls.Add(txtFolder2, 0, 0); folderRow2.Controls.Add(btnBrowse2, 1, 0);
-            table.Controls.Add(folderRow2, 0, 0);
+            btnBrowse2 = new ModernButton { Text = "Browse…" };
+            btnBrowse2.Click += BtnBrowse2_Click;
+            folderRow2.Controls.Add(txtFolder2, 0, 0);
+            folderRow2.Controls.Add(btnBrowse2, 1, 0);
+            table.Controls.Add(CreateSection(folderRow2, new WinForms.Padding(20, 18, 20, 12)), 0, 0);
 
-            lstFiles2 = new WinForms.ListBox { Dock = WinForms.DockStyle.Fill, SelectionMode = WinForms.SelectionMode.MultiExtended, BorderStyle = WinForms.BorderStyle.FixedSingle, Margin = WinForms.Padding.Empty };
-            table.Controls.Add(lstFiles2, 0, 1);
+            lstFiles2 = new WinForms.ListBox
+            {
+                SelectionMode = WinForms.SelectionMode.MultiExtended,
+                BorderStyle = WinForms.BorderStyle.FixedSingle,
+                IntegralHeight = false
+            };
+            table.Controls.Add(CreateSection(lstFiles2, new WinForms.Padding(20, 16, 20, 16), autoSize: false), 0, 1);
 
-            var controlsRow = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Top, ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0, 10, 0, 10), Margin = WinForms.Padding.Empty };
+            var controlsRow = new WinForms.TableLayoutPanel { ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0), Margin = WinForms.Padding.Empty };
             controlsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
             controlsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
 
-            var leftBlock = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Fill, ColumnCount = 1, AutoSize = true, Margin = WinForms.Padding.Empty };
+            var leftBlock = new WinForms.TableLayoutPanel { ColumnCount = 1, AutoSize = true, Margin = WinForms.Padding.Empty, Padding = new WinForms.Padding(0) };
             leftBlock.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
-            lblHint2 = new WinForms.Label { AutoSize = true, Margin = new WinForms.Padding(6, 2, 6, 6), Text = "Tip: Select files to rename only those; none selected = all (.mkv only)." };
-            var inputs = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Top, ColumnCount = 4, AutoSize = true, Margin = new WinForms.Padding(6, 2, 6, 6), Padding = WinForms.Padding.Empty };
+            lblHint2 = new WinForms.Label { AutoSize = true, Margin = new WinForms.Padding(0, 0, 0, 8), Text = "Tip: Select files to rename only those; none selected = all (.mkv only)." };
+            var inputs = new WinForms.TableLayoutPanel { ColumnCount = 4, AutoSize = true, Margin = WinForms.Padding.Empty, Padding = new WinForms.Padding(0, 6, 0, 0) };
             inputs.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             inputs.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             inputs.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             inputs.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
-            var lblPrefix = new WinForms.Label { AutoSize = true, Text = "Prefix:", Anchor = WinForms.AnchorStyles.Left, Margin = new WinForms.Padding(0, 6, 6, 6) };
-            txtPrefix2 = new WinForms.TextBox { Width = 280, Anchor = WinForms.AnchorStyles.Left, Margin = new WinForms.Padding(0, 3, 12, 3), Text = "Extras - " };
-            var lblStart = new WinForms.Label { AutoSize = true, Text = "Start:", Anchor = WinForms.AnchorStyles.Left, Margin = new WinForms.Padding(0, 6, 6, 6) };
-            numStart2 = new WinForms.NumericUpDown { Width = 90, Minimum = 1, Maximum = 9999, Value = 1, Anchor = WinForms.AnchorStyles.Left, Margin = new WinForms.Padding(0, 3, 0, 3) };
-            inputs.Controls.Add(lblPrefix, 0, 0); inputs.Controls.Add(txtPrefix2, 1, 0); inputs.Controls.Add(lblStart, 2, 0); inputs.Controls.Add(numStart2, 3, 0);
-            leftBlock.Controls.Add(lblHint2, 0, 0); leftBlock.Controls.Add(inputs, 0, 1);
+            var lblPrefix = new WinForms.Label { AutoSize = true, Text = "Prefix:", Anchor = WinForms.AnchorStyles.Left, Margin = new WinForms.Padding(0, 4, 8, 4) };
+            txtPrefix2 = new WinForms.TextBox { Width = 280, Anchor = WinForms.AnchorStyles.Left, Margin = new WinForms.Padding(0, 1, 16, 1), Text = "Extras - " };
+            var lblStart = new WinForms.Label { AutoSize = true, Text = "Start:", Anchor = WinForms.AnchorStyles.Left, Margin = new WinForms.Padding(0, 4, 8, 4) };
+            numStart2 = new WinForms.NumericUpDown { Width = 90, Minimum = 1, Maximum = 9999, Value = 1, Anchor = WinForms.AnchorStyles.Left, Margin = new WinForms.Padding(0, 1, 0, 1) };
+            inputs.Controls.Add(lblPrefix, 0, 0);
+            inputs.Controls.Add(txtPrefix2, 1, 0);
+            inputs.Controls.Add(lblStart, 2, 0);
+            inputs.Controls.Add(numStart2, 3, 0);
+            leftBlock.Controls.Add(lblHint2, 0, 0);
+            leftBlock.Controls.Add(inputs, 0, 1);
 
-            btnRenameSeq2 = new ModernButton { Text = "Rename" }; btnRenameSeq2.MinimumSize = new Drawing.Size(140, 44); btnRenameSeq2.Click += BtnRenameSeq2_Click;
-            controlsRow.Controls.Add(leftBlock, 0, 0); controlsRow.Controls.Add(btnRenameSeq2, 1, 0);
-            table.Controls.Add(controlsRow, 0, 2);
+            btnRenameSeq2 = new ModernButton { Text = "Rename" };
+            btnRenameSeq2.UseDefaultMargin = false;
+            btnRenameSeq2.Margin = new WinForms.Padding(18, 0, 0, 0);
+            btnRenameSeq2.MinimumSize = new Drawing.Size(160, 44);
+            btnRenameSeq2.Click += BtnRenameSeq2_Click;
 
-            txtLog2 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, Multiline = false, ReadOnly = true, BorderStyle = WinForms.BorderStyle.FixedSingle, Margin = WinForms.Padding.Empty };
-            table.Controls.Add(txtLog2, 0, 3);
+            controlsRow.Controls.Add(leftBlock, 0, 0);
+            controlsRow.Controls.Add(btnRenameSeq2, 1, 0);
+            table.Controls.Add(CreateSection(controlsRow, new WinForms.Padding(20, 16, 20, 12)), 0, 2);
+
+            txtLog2 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, Multiline = false, ReadOnly = true, BorderStyle = WinForms.BorderStyle.FixedSingle };
+            table.Controls.Add(CreateSection(txtLog2, new WinForms.Padding(20, 6, 20, 6), new WinForms.Padding(0)), 0, 3);
         }
 
         private void BtnBrowse2_Click(object? sender, EventArgs e)
@@ -544,29 +631,40 @@ namespace MKVRenamer
             table.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.Absolute, 40));
             tabNewFolder.Controls.Clear(); tabNewFolder.Controls.Add(table);
 
-            var row1 = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Top, ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(2), Margin = WinForms.Padding.Empty };
+            var row1 = new WinForms.TableLayoutPanel { ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0), Margin = WinForms.Padding.Empty };
             row1.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
             row1.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             txtParent3 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, ReadOnly = true, PlaceholderText = "Choose where to create the new movie folder" };
-            btnBrowse3 = new ModernButton { Text = "Browse…" }; btnBrowse3.Click += BtnBrowse3_Click;
-            row1.Controls.Add(txtParent3, 0, 0); row1.Controls.Add(btnBrowse3, 1, 0); table.Controls.Add(row1, 0, 0);
+            btnBrowse3 = new ModernButton { Text = "Browse…" };
+            btnBrowse3.Click += BtnBrowse3_Click;
+            row1.Controls.Add(txtParent3, 0, 0);
+            row1.Controls.Add(btnBrowse3, 1, 0);
+            table.Controls.Add(CreateSection(row1, new WinForms.Padding(20, 18, 20, 12)), 0, 0);
 
-            var row2 = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Top, ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0, 8, 0, 0), Margin = WinForms.Padding.Empty };
+            var row2 = new WinForms.TableLayoutPanel { ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0), Margin = WinForms.Padding.Empty };
             row2.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             row2.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
-            var lblName = new WinForms.Label { AutoSize = true, Text = "Folder name:", Margin = new WinForms.Padding(6, 6, 6, 6) };
+            var lblName = new WinForms.Label { AutoSize = true, Text = "Folder name:", Margin = new WinForms.Padding(0, 0, 12, 0) };
             txtName3 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, PlaceholderText = "e.g., Austin Powers Goldmember (2002)" };
-            row2.Controls.Add(lblName, 0, 0); row2.Controls.Add(txtName3, 1, 0); table.Controls.Add(row2, 0, 1);
+            row2.Controls.Add(lblName, 0, 0);
+            row2.Controls.Add(txtName3, 1, 0);
+            table.Controls.Add(CreateSection(row2, new WinForms.Padding(20, 16, 20, 12)), 0, 1);
 
-            var row3 = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Top, ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0, 8, 0, 8), Margin = WinForms.Padding.Empty };
+            var row3 = new WinForms.TableLayoutPanel { ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0), Margin = WinForms.Padding.Empty };
             row3.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
             row3.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
-            chkExtras3 = new WinForms.CheckBox { Text = "Also create Extras subfolder", AutoSize = true, Margin = new WinForms.Padding(6, 6, 6, 6) };
-            btnCreate3 = new ModernButton { Text = "Create Folder" }; btnCreate3.MinimumSize = new Drawing.Size(160, 44); btnCreate3.Click += BtnCreate3_Click;
-            row3.Controls.Add(chkExtras3, 0, 0); row3.Controls.Add(btnCreate3, 1, 0); table.Controls.Add(row3, 0, 2);
+            chkExtras3 = new WinForms.CheckBox { Text = "Also create Extras subfolder", AutoSize = true, Margin = new WinForms.Padding(0, 4, 0, 0) };
+            btnCreate3 = new ModernButton { Text = "Create Folder" };
+            btnCreate3.UseDefaultMargin = false;
+            btnCreate3.Margin = new WinForms.Padding(18, 0, 0, 0);
+            btnCreate3.MinimumSize = new Drawing.Size(180, 44);
+            btnCreate3.Click += BtnCreate3_Click;
+            row3.Controls.Add(chkExtras3, 0, 0);
+            row3.Controls.Add(btnCreate3, 1, 0);
+            table.Controls.Add(CreateSection(row3, new WinForms.Padding(20, 16, 20, 12)), 0, 2);
 
-            txtLog3 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, Multiline = false, ReadOnly = true, BorderStyle = WinForms.BorderStyle.FixedSingle, Margin = WinForms.Padding.Empty };
-            table.Controls.Add(txtLog3, 0, 3);
+            txtLog3 = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, Multiline = false, ReadOnly = true, BorderStyle = WinForms.BorderStyle.FixedSingle };
+            table.Controls.Add(CreateSection(txtLog3, new WinForms.Padding(20, 6, 20, 6), new WinForms.Padding(0)), 0, 3);
         }
 
         private void BtnBrowse3_Click(object? sender, EventArgs e)
@@ -609,33 +707,25 @@ namespace MKVRenamer
             tabTV.Controls.Add(table);
 
             // ---------- TOP BAR ----------
-            var topBarOuter = new WinForms.Panel
-            {
-                Dock = WinForms.DockStyle.Fill,
-                Padding = new WinForms.Padding(12, 12, 12, 8), // a little more breathing room
-                Margin = WinForms.Padding.Empty
-            };
-            table.Controls.Add(topBarOuter, 0, 0);
-
             var topBar = new WinForms.TableLayoutPanel
             {
                 Dock = WinForms.DockStyle.Fill,
                 ColumnCount = 3,
                 AutoSize = false,
-                Padding = new WinForms.Padding(6),
+                Padding = new WinForms.Padding(0),
                 Margin = WinForms.Padding.Empty
             };
             topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 45F));
             topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 35F));
             topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 20F));
-            topBarOuter.Controls.Add(topBar);
+            table.Controls.Add(CreateSection(topBar, new WinForms.Padding(20, 18, 20, 12)), 0, 0);
 
             WinForms.Panel Card() => new WinForms.Panel
             {
                 BackColor = Theme.Surface,
                 Dock = WinForms.DockStyle.Fill,
-                Padding = new WinForms.Padding(12),
-                Margin = new WinForms.Padding(6, 0, 6, 0)
+                Padding = new WinForms.Padding(16, 14, 16, 14),
+                Margin = new WinForms.Padding(12, 0, 12, 0)
             };
 
             // Folder card
@@ -645,6 +735,8 @@ namespace MKVRenamer
             folderRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             txtShowFolderTV = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, ReadOnly = true, PlaceholderText = "Select the TV show folder (top-level)" };
             btnBrowseTV = new ModernButton { Text = "Browse…" };
+            btnBrowseTV.UseDefaultMargin = false;
+            btnBrowseTV.Margin = new WinForms.Padding(16, 0, 0, 0);
             btnBrowseTV.Click += BtnBrowseTV_Click;
             folderRow.Controls.Add(txtShowFolderTV, 0, 0);
             folderRow.Controls.Add(btnBrowseTV, 1, 0);
@@ -656,7 +748,7 @@ namespace MKVRenamer
             var seriesRow = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Fill, ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0), Margin = WinForms.Padding.Empty };
             seriesRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             seriesRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
-            var lblSeries = new WinForms.Label { AutoSize = true, Text = "Series Title:", Margin = new WinForms.Padding(0, 6, 10, 6) };
+            var lblSeries = new WinForms.Label { AutoSize = true, Text = "Series Title:", Margin = new WinForms.Padding(0, 0, 12, 0) };
             txtSeriesTitleTV = new WinForms.TextBox { Dock = WinForms.DockStyle.Fill, PlaceholderText = "e.g., The Office (US)" };
             seriesRow.Controls.Add(lblSeries, 0, 0);
             seriesRow.Controls.Add(txtSeriesTitleTV, 1, 0);
@@ -676,14 +768,14 @@ namespace MKVRenamer
             seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // label
             seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));          // numeric up/down
             seasonsRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));     // button stretches with window
-            var lblSeasons = new WinForms.Label { AutoSize = true, Text = "Seasons:", Margin = new WinForms.Padding(0, 6, 8, 6) };
-            numSeasonsTV = new WinForms.NumericUpDown { Minimum = 1, Maximum = 99, Value = 1, Width = 72, Margin = new WinForms.Padding(0, 2, 10, 2) };
+            var lblSeasons = new WinForms.Label { AutoSize = true, Text = "Seasons:", Margin = new WinForms.Padding(0, 0, 12, 0) };
+            numSeasonsTV = new WinForms.NumericUpDown { Minimum = 1, Maximum = 99, Value = 1, Width = 72, Margin = new WinForms.Padding(0, 0, 12, 0) };
             btnCreateSeasonsTV = new ModernButton { Text = "Create Season Folders" };
             btnCreateSeasonsTV.UseDefaultMargin = false;
+            btnCreateSeasonsTV.Margin = new WinForms.Padding(0);
             btnCreateSeasonsTV.AutoSize = false;
             btnCreateSeasonsTV.Dock = WinForms.DockStyle.Fill;
             btnCreateSeasonsTV.MinimumSize = new Drawing.Size(0, 44);
-            btnCreateSeasonsTV.Margin = new WinForms.Padding(0);
             btnCreateSeasonsTV.Click += BtnCreateSeasonsTV_Click;
 
             seasonsRow.Controls.Add(lblSeasons, 0, 0);
@@ -695,13 +787,11 @@ namespace MKVRenamer
             // ---------- LIST (episodes) ----------
             lvTV = new WinForms.ListView
             {
-                Dock = WinForms.DockStyle.Fill,
                 View = WinForms.View.Details,
                 FullRowSelect = true,
                 HideSelection = false,
                 MultiSelect = true,
-                BorderStyle = WinForms.BorderStyle.FixedSingle,
-                Margin = new WinForms.Padding(12, 0, 12, 0)
+                BorderStyle = WinForms.BorderStyle.FixedSingle
             };
             lvTV.Columns.Add("File", 360);
             lvTV.Columns.Add("Season", 80);
@@ -709,15 +799,14 @@ namespace MKVRenamer
             lvTV.Columns.Add("Episode Title", 360);
             lvTV.Columns.Add("Duration", 110);
             lvTV.Resize += (s, e) => AutoSizeColumnsTV();
-            table.Controls.Add(lvTV, 0, 1);
+            table.Controls.Add(CreateSection(lvTV, new WinForms.Padding(20, 12, 20, 12), new WinForms.Padding(0, 0, 0, 12), autoSize: false), 0, 1);
 
             // ---------- ASSIGN ROW ----------
             var assignRow = new WinForms.TableLayoutPanel
             {
-                Dock = WinForms.DockStyle.Fill,
                 ColumnCount = 4,
-                AutoSize = false,
-                Padding = new WinForms.Padding(12, 8, 12, 8),
+                AutoSize = true,
+                Padding = new WinForms.Padding(0),
                 Margin = WinForms.Padding.Empty
             };
             assignRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
@@ -725,34 +814,33 @@ namespace MKVRenamer
             assignRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             assignRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
 
-            var lblAssign = new WinForms.Label { AutoSize = true, Text = "Assign to season:", Margin = new WinForms.Padding(0, 10, 10, 6) };
-            cboSeasonTV = new WinForms.ComboBox { DropDownStyle = WinForms.ComboBoxStyle.DropDownList, Width = 140, Margin = new WinForms.Padding(0, 6, 10, 6) };
+            var lblAssign = new WinForms.Label { AutoSize = true, Text = "Assign to season:", Margin = new WinForms.Padding(0, 0, 12, 0) };
+            cboSeasonTV = new WinForms.ComboBox { DropDownStyle = WinForms.ComboBoxStyle.DropDownList, Width = 140, Margin = new WinForms.Padding(0, 0, 16, 0) };
             cboSeasonTV.Items.AddRange(Enumerable.Range(1, 99).Select(i => (object)$"Season {i}").ToArray());
             cboSeasonTV.SelectedIndex = 0;
 
             btnAssignSeasonTV = new ModernButton { Text = "Set Season for Selected" };
             btnAssignSeasonTV.UseDefaultMargin = false;
-            btnAssignSeasonTV.Margin = new WinForms.Padding(6, 2, 6, 2);
+            btnAssignSeasonTV.Margin = new WinForms.Padding(0, 0, 12, 0);
             btnAssignSeasonTV.Click += BtnAssignSeasonTV_Click;
 
             btnEditTitleTV = new ModernButton { Text = "Edit Episode Title…" };
             btnEditTitleTV.UseDefaultMargin = false;
-            btnEditTitleTV.Margin = new WinForms.Padding(6, 2, 0, 2);
+            btnEditTitleTV.Margin = new WinForms.Padding(0);
             btnEditTitleTV.Click += BtnEditTitleTV_Click;
 
             assignRow.Controls.Add(lblAssign, 0, 0);
             assignRow.Controls.Add(cboSeasonTV, 1, 0);
             assignRow.Controls.Add(btnAssignSeasonTV, 2, 0);
             assignRow.Controls.Add(btnEditTitleTV, 3, 0);
-            table.Controls.Add(assignRow, 0, 2);
+            table.Controls.Add(CreateSection(assignRow, new WinForms.Padding(20, 12, 20, 12)), 0, 2);
 
             // ---------- BOTTOM ROW (button + slim log) ----------
             var bottomRow = new WinForms.TableLayoutPanel
             {
-                Dock = WinForms.DockStyle.Fill,
                 ColumnCount = 2,
                 RowCount = 1,
-                Padding = new WinForms.Padding(12, 0, 12, 8),
+                Padding = new WinForms.Padding(0),
                 Margin = WinForms.Padding.Empty
             };
             bottomRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
@@ -760,7 +848,7 @@ namespace MKVRenamer
 
             btnMoveRenameTV = new ModernButton { Text = "Move & Rename (Seasons)" };
             btnMoveRenameTV.UseDefaultMargin = false;
-            btnMoveRenameTV.Margin = new WinForms.Padding(0, 0, 10, 0);
+            btnMoveRenameTV.Margin = new WinForms.Padding(0, 0, 18, 0);
             btnMoveRenameTV.AutoSize = false;
             btnMoveRenameTV.MinimumSize = new Drawing.Size(220, 44);
             btnMoveRenameTV.Height = 44;
@@ -772,14 +860,13 @@ namespace MKVRenamer
                 Multiline = false,
                 ReadOnly = true,
                 BorderStyle = WinForms.BorderStyle.FixedSingle,
-                Margin = WinForms.Padding.Empty,
                 MinimumSize = new Drawing.Size(0, 28),
                 MaximumSize = new Drawing.Size(int.MaxValue, 28)
             };
 
             bottomRow.Controls.Add(btnMoveRenameTV, 0, 0);
             bottomRow.Controls.Add(txtLogTV, 1, 0);
-            table.Controls.Add(bottomRow, 0, 3);
+            table.Controls.Add(CreateSection(bottomRow, new WinForms.Padding(20, 8, 20, 12), new WinForms.Padding(0)), 0, 3);
 
             AutoSizeColumnsTV();
         }
