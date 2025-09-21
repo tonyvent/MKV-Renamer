@@ -55,13 +55,13 @@ A fast, friendly Windows app for organizing movie folders:
 > Add these later in `docs/` and update the paths.
 
 **Main & Extras**  
-![Main view](docs/screenshot-main.png)
+![Main view](Docs/screenshot-main.png)
 
 **Rename Extras**  
-![Rename Extras](docs/screenshot-rename.png)
+![Rename Extras](Docs/screenshot-rename.png)
 
 **New Movie Folder**  
-![New Folder](docs/screenshot-newfolder.png)
+![New Folder](Docs/screenshot-newfolder.png)
 
 ---
 
