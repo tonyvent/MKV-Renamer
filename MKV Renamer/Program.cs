@@ -715,9 +715,48 @@ namespace MKVRenamer
                 Padding = new WinForms.Padding(0),
                 Margin = WinForms.Padding.Empty
             };
-            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 45F));
-            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 35F));
-            topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 20F));
+            bool? topBarStacked = null;
+            WinForms.Panel cardFolder = null!;
+            WinForms.Panel cardSeries = null!;
+            WinForms.Panel cardSeasons = null!;
+
+            void ConfigureTopBarLayout()
+            {
+                bool stack = topBar.Width < 1250;
+                if (topBarStacked.HasValue && stack == topBarStacked.Value) return;
+
+                topBarStacked = stack;
+                topBar.SuspendLayout();
+                topBar.ColumnStyles.Clear();
+                topBar.RowStyles.Clear();
+
+                if (stack)
+                {
+                    topBar.ColumnCount = 1;
+                    topBar.RowCount = 3;
+                    topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
+                    for (int i = 0; i < 3; i++)
+                        topBar.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.AutoSize));
+                    topBar.SetCellPosition(cardFolder, new WinForms.TableLayoutPanelCellPosition(0, 0));
+                    topBar.SetCellPosition(cardSeries, new WinForms.TableLayoutPanelCellPosition(0, 1));
+                    topBar.SetCellPosition(cardSeasons, new WinForms.TableLayoutPanelCellPosition(0, 2));
+                }
+                else
+                {
+                    topBar.ColumnCount = 3;
+                    topBar.RowCount = 1;
+                    topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 45F));
+                    topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 35F));
+                    topBar.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 20F));
+                    topBar.RowStyles.Add(new WinForms.RowStyle(WinForms.SizeType.Percent, 100F));
+                    topBar.SetCellPosition(cardFolder, new WinForms.TableLayoutPanelCellPosition(0, 0));
+                    topBar.SetCellPosition(cardSeries, new WinForms.TableLayoutPanelCellPosition(1, 0));
+                    topBar.SetCellPosition(cardSeasons, new WinForms.TableLayoutPanelCellPosition(2, 0));
+                }
+
+                topBar.ResumeLayout();
+            }
+
             table.Controls.Add(CreateSection(topBar, new WinForms.Padding(20, 18, 20, 12)), 0, 0);
 
             WinForms.Panel Card() => new WinForms.Panel
@@ -729,7 +768,7 @@ namespace MKVRenamer
             };
 
             // Folder card
-            var cardFolder = Card();
+            cardFolder = Card();
             var folderRow = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Fill, ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0), Margin = WinForms.Padding.Empty };
             folderRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
             folderRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
@@ -744,7 +783,7 @@ namespace MKVRenamer
             topBar.Controls.Add(cardFolder, 0, 0);
 
             // Series Title card
-            var cardSeries = Card();
+            cardSeries = Card();
             var seriesRow = new WinForms.TableLayoutPanel { Dock = WinForms.DockStyle.Fill, ColumnCount = 2, AutoSize = true, Padding = new WinForms.Padding(0), Margin = WinForms.Padding.Empty };
             seriesRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.AutoSize));
             seriesRow.ColumnStyles.Add(new WinForms.ColumnStyle(WinForms.SizeType.Percent, 100F));
@@ -756,7 +795,7 @@ namespace MKVRenamer
             topBar.Controls.Add(cardSeries, 1, 0);
 
             // Seasons card (FIXED LAYOUT)
-            var cardSeasons = Card();
+            cardSeasons = Card();
             var seasonsRow = new WinForms.TableLayoutPanel
             {
                 Dock = WinForms.DockStyle.Fill,
@@ -775,7 +814,7 @@ namespace MKVRenamer
             btnCreateSeasonsTV.Margin = new WinForms.Padding(0);
             btnCreateSeasonsTV.AutoSize = false;
             btnCreateSeasonsTV.Dock = WinForms.DockStyle.Fill;
-            btnCreateSeasonsTV.MinimumSize = new Drawing.Size(0, 44);
+            btnCreateSeasonsTV.MinimumSize = new Drawing.Size(200, 44);
             btnCreateSeasonsTV.Click += BtnCreateSeasonsTV_Click;
 
             seasonsRow.Controls.Add(lblSeasons, 0, 0);
@@ -783,6 +822,9 @@ namespace MKVRenamer
             seasonsRow.Controls.Add(btnCreateSeasonsTV, 2, 0);
             cardSeasons.Controls.Add(seasonsRow);
             topBar.Controls.Add(cardSeasons, 2, 0);
+
+            ConfigureTopBarLayout();
+            topBar.SizeChanged += (s, e) => ConfigureTopBarLayout();
 
             // ---------- LIST (episodes) ----------
             lvTV = new WinForms.ListView
